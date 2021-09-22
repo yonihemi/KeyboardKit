@@ -93,6 +93,8 @@ open class KeyboardCollectionView: UICollectionView, ResponderChainInjection {
 /// See `KeyboardCollectionView` for further details. There is no difference in
 /// functionality between the view subclass and the view controller subclass.
 open class KeyboardCollectionViewController: UICollectionViewController, ResponderChainInjection {
+	public var allowsSystemFocus = true
+	
     open override var canBecomeFirstResponder: Bool {
         true
     }
@@ -119,11 +121,15 @@ open class KeyboardCollectionViewController: UICollectionViewController, Respond
 
 #if !targetEnvironment(macCatalyst)
         if #available(iOS 15.0, *) {
-            collectionView.allowsFocus = true
-            collectionView.remembersLastFocusedIndexPath = true
+            collectionView.allowsFocus = allowsSystemFocus
+            collectionView.remembersLastFocusedIndexPath = allowsSystemFocus
         }
 #endif
     }
+	
+	public func focusItem(at indexPath: IndexPath) {
+		collectionView.selectAndShowItemAtIndexPath(indexPath, extendSelection: false)
+	}
 }
 
 /// A collection view’s `delegate` can conform to this protocol to receive callbacks about keyboard-specific events.
@@ -156,6 +162,7 @@ public protocol KeyboardCollectionViewDelegate: UICollectionViewDelegate {
 
 extension UICollectionView {
     override var kbd_isArrowKeyScrollingEnabled: Bool {
+//		true
         isKeyboardScrollingEnabled
     }
 
@@ -205,7 +212,7 @@ extension UICollectionView: SelectableCollection {
     }
 
     var indexPathsForFocusedOrSelectedItems: [IndexPath] {
-        if UIFocusSystem(for: self) != nil {
+        if isFocusActive {
             return preferredFocusEnvironments.compactMap { $0 as? UICollectionViewCell }.compactMap { indexPath(for: $0) }
         } else {
             return indexPathsForSelectedItems ?? []

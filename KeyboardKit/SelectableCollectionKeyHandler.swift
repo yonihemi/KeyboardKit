@@ -85,7 +85,7 @@ class SelectableCollectionKeyHandler: InjectableResponder {
     private lazy var changeSelectionKeyCommands: [UIKeyCommand] = [.upArrow, .downArrow, .leftArrow, .rightArrow].flatMap { input -> [UIKeyCommand] in
         // TODO: Add .shift and [.alternate, .shift] here to support extending multiple selection.
         [UIKeyModifierFlags(), .alternate].map { modifierFlags in
-            UIKeyCommand((modifierFlags, input), action: #selector(updateSelectionFromKeyCommand), allowsAutomaticMirroring: false)
+			UIKeyCommand((modifierFlags, input), action: #selector(updateSelectionFromKeyCommand), wantsPriorityOverSystemBehavior: true, allowsAutomaticMirroring: false)
         }
     }
 
@@ -123,7 +123,7 @@ class SelectableCollectionKeyHandler: InjectableResponder {
          key commands when not on the responder chain using the `isInResponderChain` helper.
          */
         if collection.shouldAllowSelection && isInResponderChain {
-            if UIFocusSystem(for: collection) == nil && UIResponder.isTextInputActive == false {
+			if !collection.isFocusActive && UIResponder.isTextInputActive == false {
                 // On iOS 15.0 (as of beta 4) a key command with an action that nothing can perform still blocks
                 // other key commands from handling the same input. This was not an issue on iOS 14 and earlier.
                 // This has been reported as FB9469253.
@@ -258,6 +258,14 @@ class SelectableCollectionKeyHandler: InjectableResponder {
 // MARK: - Allowing selection
 
 extension SelectableCollection {
+	var isFocusActive: Bool {
+		if #available(iOS 15.0, *) {
+			return UIFocusSystem.focusSystem(for: self) != nil && allowsFocus
+		} else {
+			return false
+		}
+	}
+	
     var isKeyboardScrollingEnabled: Bool {
         if UIFocusSystem(for: self) != nil {
 #if !targetEnvironment(macCatalyst)
@@ -283,7 +291,7 @@ extension SelectableCollection {
 
 // MARK: - Arrow key selection
 
-private extension SelectableCollection {
+extension SelectableCollection {
 
     /// Returns the index path of the item found by moving the given step in the given direction from the currently selected item.
     func indexPathInDirection(_ direction: NavigationDirection, step: NavigationStep) -> IndexPath? {
