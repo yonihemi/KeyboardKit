@@ -104,6 +104,28 @@ class SelectableCollectionKeyHandler: InjectableResponder {
         UIKeyCommand(([.alternate, .command], .leftArrow),  action: #selector(kbd_move), title: localisedString(.collection_moveLeft),  allowsAutomaticMirroring: false),
         UIKeyCommand(([.alternate, .command], .rightArrow), action: #selector(kbd_move), title: localisedString(.collection_moveRight), allowsAutomaticMirroring: false),
     ]
+	
+	func collectionChangeSelectionKeyCommands() -> [UIKeyCommand] {
+		changeSelectionKeyCommands
+			.filter { targetSelectedIndexPathForKeyCommand($0) != nil }
+	}
+	
+	func collectionKeyCommands() -> [UIKeyCommand] {
+		var commands = [UIKeyCommand]()
+		// On iOS 15.0 (as of beta 4) a key command with an action that nothing can perform still blocks
+		// other key commands from handling the same input. This was not an issue on iOS 14 and earlier.
+		// This has been reported as FB9469253.
+		commands += collectionChangeSelectionKeyCommands()
+
+		if collection.indexPathsForFocusedOrSelectedItems.count == 1 {
+			commands += activateSelectionKeyCommands
+		}
+
+		if collection.shouldAllowEmptySelection ?? true && collection.indexPathsForFocusedOrSelectedItems.isEmpty == false {
+			commands += deselectionKeyCommands
+		}
+		return commands
+	}
 
     override var keyCommands: [UIKeyCommand]? {
         var commands = super.keyCommands ?? []
@@ -124,25 +146,13 @@ class SelectableCollectionKeyHandler: InjectableResponder {
          */
         if collection.shouldAllowSelection && isInResponderChain {
 			if !collection.isFocusActive && UIResponder.isTextInputActive == false {
-                // On iOS 15.0 (as of beta 4) a key command with an action that nothing can perform still blocks
-                // other key commands from handling the same input. This was not an issue on iOS 14 and earlier.
-                // This has been reported as FB9469253.
-                commands += changeSelectionKeyCommands.filter { targetSelectedIndexPathForKeyCommand($0) != nil }
-
-                if collection.indexPathsForFocusedOrSelectedItems.count == 1 {
-                    commands += activateSelectionKeyCommands
-                }
-
-                if collection.shouldAllowEmptySelection ?? true && collection.indexPathsForFocusedOrSelectedItems.isEmpty == false {
-                    commands += deselectionKeyCommands
-                }
+                commands += collectionKeyCommands()
             }
 
             if collection.shouldAllowMoving {
                 commands += moveKeyCommands
             }
         }
-
         return commands
     }
 
@@ -203,7 +213,7 @@ class SelectableCollectionKeyHandler: InjectableResponder {
         return collection.targetIndexPathForMoveFromItem(at: sourceIndexPath, toProposedIndexPath: proposed) ?? proposed
     }
 
-    @objc private func updateSelectionFromKeyCommand(_ sender: UIKeyCommand) {
+    @objc func updateSelectionFromKeyCommand(_ sender: UIKeyCommand) {
         guard let indexPath = targetSelectedIndexPathForKeyCommand(sender) else {
             return
         }

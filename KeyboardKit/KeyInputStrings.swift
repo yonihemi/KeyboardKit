@@ -3,7 +3,7 @@
 import UIKit
 
 /// Convenience strings for the `input` of a `UIKeyCommand`.
-extension String {
+public extension String {
     static let delete: String = {
 #if !targetEnvironment(macCatalyst)
         if #available(iOS 15.0, *) {

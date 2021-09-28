@@ -130,6 +130,14 @@ open class KeyboardCollectionViewController: UICollectionViewController, Respond
 	public func focusItem(at indexPath: IndexPath) {
 		collectionView.selectAndShowItemAtIndexPath(indexPath, extendSelection: false)
 	}
+	
+	public func collectionKeyCommands() -> [UIKeyCommand] {
+		selectableCollectionKeyHandler.collectionKeyCommands()
+	}
+	
+	public func collectionChangeSelectionKeyCommands() -> [UIKeyCommand] {
+		selectableCollectionKeyHandler.collectionChangeSelectionKeyCommands()
+	}
 }
 
 /// A collection view’s `delegate` can conform to this protocol to receive callbacks about keyboard-specific events.
