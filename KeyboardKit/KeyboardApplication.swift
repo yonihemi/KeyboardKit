@@ -42,7 +42,6 @@ open class KeyboardApplication: UIApplication {
     open var canOpenSettings = false
 
     // Leave cmd + N for compose, or making new documents. Using cmd + opt + N matches Mail on the Mac’s command for New Viewer Window.
-    @available(iOS 13.0, *)
     private lazy var newWindowKeyCommand = UIKeyCommand(([.command, .alternate], "N"), action: #selector(kbd_createNewWindowScene), title: localisedString(.app_newWindow))
     private lazy var openSettingsKeyCommand = UIKeyCommand((.command, ","), action: #selector(kbd_openSettings), title: localisedString(.app_settings))
 
@@ -60,9 +59,8 @@ open class KeyboardApplication: UIApplication {
         return commands
     }
 
-    @available(iOS 13.0, *)
     @objc func kbd_createNewWindowScene(_ sender: UIKeyCommand) {
-        requestSceneSessionActivation(nil, userActivity: nil, options: nil, errorHandler: nil)
+		requestSceneSessionActivation(nil, userActivity: nil, options: nil, errorHandler: nil)
     }
 
     @objc func kbd_openSettings(_ sender: UIKeyCommand) {
