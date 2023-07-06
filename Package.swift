@@ -1,11 +1,11 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "KeyboardKit",
     defaultLocalization: "en",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v15)],
     products: [
         .library(
             name: "KeyboardKit",

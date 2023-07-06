@@ -54,10 +54,8 @@ open class KeyboardTableView: UITableView, ResponderChainInjection {
 
     private func sharedInit() {
 #if !targetEnvironment(macCatalyst)
-        if #available(iOS 15.0, *) {
-            allowsFocus = true
-            remembersLastFocusedIndexPath = true
-        }
+		allowsFocus = true
+		remembersLastFocusedIndexPath = true
 #endif
     }
 
@@ -99,10 +97,8 @@ open class KeyboardTableViewController: UITableViewController, ResponderChainInj
         super.viewDidLoad()
 
 #if !targetEnvironment(macCatalyst)
-        if #available(iOS 15.0, *) {
-            tableView.allowsFocus = true
-            tableView.remembersLastFocusedIndexPath = true
-        }
+		tableView.allowsFocus = true
+		tableView.remembersLastFocusedIndexPath = true
 #endif
     }
 }
@@ -236,7 +232,7 @@ extension UITableView: SelectableCollection {
     }
 
     var indexPathsForFocusedOrSelectedItems: [IndexPath] {
-        if UIFocusSystem(for: self) != nil {
+		if UIFocusSystem.focusSystem(for: self) != nil {
             return preferredFocusEnvironments.compactMap { $0 as? UITableViewCell }.compactMap { indexPath(for: $0) }
         } else {
             return indexPathsForSelectedRows ?? []
@@ -374,7 +370,7 @@ private extension UITableView {
 
         let indexPathsToDelete = indexPathsForFocusedOrSelectedItems
 
-        if UIFocusSystem(for: self) != nil {
+		if UIFocusSystem.focusSystem(for: self) != nil {
             // The focus system either focuses the item right at the top of loses focus, but it’s hard to force it to focus something better.
         } else {
             let newSelectedIndexPath = selectableIndexPathAfterIndexPath(indexPathsForFocusedOrSelectedItems.last!) ?? selectableIndexPathBeforeIndexPath(indexPathsForFocusedOrSelectedItems.first!)

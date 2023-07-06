@@ -57,7 +57,7 @@ open class KeyboardWindow: UIWindow {
         let presentationController = topmost.presentationController!
 
         guard
-            topmost.isModal == false,
+            topmost.isModalInPresentation == false,
             delegateSaysPresentationControllerShouldDismiss(presentationController)
         else {
             tellDelegatePresentationControllerDidAttemptToDismiss(presentationController)
@@ -92,7 +92,7 @@ private func delegateSaysPresentationControllerShouldDismiss(_ presentationContr
     }
 
     // Since Catalyst did not start until iOS 13 this warns even though the deployment target is iOS 12.
-    #if !targetEnvironment(macCatalyst)
+    #if !targetEnvironment(macCatalyst) && !os(visionOS)
     if
         let popoverPresentationController = presentationController as? UIPopoverPresentationController,
         let should = popoverPresentationController.delegate?.popoverPresentationControllerShouldDismissPopover?(popoverPresentationController)
@@ -124,7 +124,7 @@ private func tellDelegatePresentationControllerDidDismiss(_ presentationControll
     }
 
     // Since Catalyst did not start until iOS 13 this warns even though the deployment target is iOS 12.
-    #if !targetEnvironment(macCatalyst)
+    #if !targetEnvironment(macCatalyst) && !os(visionOS)
     if let popoverPresentationController = presentationController as? UIPopoverPresentationController {
         popoverPresentationController.delegate?.popoverPresentationControllerDidDismissPopover?(popoverPresentationController)
     }
@@ -147,17 +147,6 @@ private extension UIModalPresentationStyle {
             }
         case .fullScreen, .currentContext, .custom, .overFullScreen, .overCurrentContext, .none: fallthrough @unknown default:
             return false
-        }
-    }
-}
-
-private extension UIViewController {
-    /// Same as `isModalInPresentation` on iOS 13 and later, or `isModalInPopover` on earlier versions.
-    var isModal: Bool {
-        if #available(iOS 13, *) {
-            return isModalInPresentation
-        } else {
-            return isModalInPopover
         }
     }
 }

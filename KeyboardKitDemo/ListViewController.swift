@@ -96,7 +96,7 @@ class ListViewController: FirstResponderViewController, UICollectionViewDelegate
         // When dropping iOS 14 (so first responder management is no longer necessary) it would be good to swap the
         // superclass to UICollectionViewController because that handles deselection on appearing automatically.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            if UIFocusSystem(for: self) != nil {
+			if UIFocusSystem.focusSystem(for: self) != nil {
                 self.collectionView.selectItem(at: nil, animated: true, scrollPosition: [])
             }
         }

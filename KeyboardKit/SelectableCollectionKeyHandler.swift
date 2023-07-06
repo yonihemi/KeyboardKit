@@ -33,13 +33,13 @@ protocol SelectableCollection: UIFocusEnvironment {
 
     var allowsSelection: Bool { get }
     var allowsMultipleSelection: Bool { get }
-    var allowsSelectionDuringEditing_: Bool { get }
-    var allowsMultipleSelectionDuringEditing_: Bool { get }
-    var isEditing_: Bool { get }
+    var allowsSelectionDuringEditing: Bool { get }
+    var allowsMultipleSelectionDuringEditing: Bool { get }
+    var isEditing: Bool { get }
 
 #if !targetEnvironment(macCatalyst)
-    @available(iOS 15.0, *) var allowsFocus: Bool { get }
-    @available(iOS 15.0, *) var allowsFocusDuringEditing: Bool { get }
+    var allowsFocus: Bool { get }
+    var allowsFocusDuringEditing: Bool { get }
 #endif
 
     /// Optional because the delegate might not implement the method so the default value is not repeated.
@@ -269,33 +269,25 @@ class SelectableCollectionKeyHandler: InjectableResponder {
 
 extension SelectableCollection {
 	var isFocusActive: Bool {
-		if #available(iOS 15.0, *) {
-			return UIFocusSystem.focusSystem(for: self) != nil && allowsFocus
-		} else {
-			return false
-		}
+		UIFocusSystem.focusSystem(for: self) != nil && allowsFocus
 	}
 	
     var isKeyboardScrollingEnabled: Bool {
-        if UIFocusSystem(for: self) != nil {
+		if UIFocusSystem.focusSystem(for: self) != nil {
 #if !targetEnvironment(macCatalyst)
-            if #available(iOS 15.0, *) {
-                return (isEditing_ ? allowsFocusDuringEditing : allowsFocus) == false
-            }
+			return (isEditing ? allowsFocusDuringEditing : allowsFocus) == false
 #endif
-            // There’s no simple property to disable focus on Big Sur so just assume focus will be enabled.
-            return false
         } else {
             return shouldAllowSelection == false
         }
     }
 
     var shouldAllowSelection: Bool {
-        isEditing_ ? allowsSelectionDuringEditing_ : allowsSelection
+        isEditing ? allowsSelectionDuringEditing : allowsSelection
     }
 
     var shouldAllowMultipleSelection: Bool {
-        isEditing_ ? allowsMultipleSelectionDuringEditing_ : allowsMultipleSelection
+        isEditing ? allowsMultipleSelectionDuringEditing : allowsMultipleSelection
     }
 }
 

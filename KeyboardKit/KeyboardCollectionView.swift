@@ -59,10 +59,8 @@ open class KeyboardCollectionView: UICollectionView, ResponderChainInjection {
 
     private func sharedInit() {
 #if !targetEnvironment(macCatalyst)
-        if #available(iOS 15.0, *) {
-            allowsFocus = true
-            remembersLastFocusedIndexPath = true
-        }
+		allowsFocus = true
+		remembersLastFocusedIndexPath = true
 #endif
     }
 
@@ -120,10 +118,8 @@ open class KeyboardCollectionViewController: UICollectionViewController, Respond
         super.viewDidLoad()
 
 #if !targetEnvironment(macCatalyst)
-        if #available(iOS 15.0, *) {
-            collectionView.allowsFocus = allowsSystemFocus
-            collectionView.remembersLastFocusedIndexPath = allowsSystemFocus
-        }
+		collectionView.allowsFocus = allowsSystemFocus
+		collectionView.remembersLastFocusedIndexPath = allowsSystemFocus
 #endif
     }
 	
@@ -182,30 +178,6 @@ extension UICollectionView {
 extension UICollectionView: SelectableCollection {
     private var keyboardDelegate: KeyboardCollectionViewDelegate? {
         delegate as? KeyboardCollectionViewDelegate
-    }
-
-    var allowsSelectionDuringEditing_: Bool {
-        if #available(iOS 14.0, *) {
-            return allowsSelectionDuringEditing
-        } else {
-            return false // Doesn’t matter because isEditing_ will always be false.
-        }
-    }
-
-    var allowsMultipleSelectionDuringEditing_: Bool {
-        if #available(iOS 14.0, *) {
-            return allowsMultipleSelectionDuringEditing
-        } else {
-            return false // Doesn’t matter because isEditing_ will always be false.
-        }
-    }
-
-    var isEditing_: Bool {
-        if #available(iOS 14.0, *) {
-            return isEditing
-        } else {
-            return false
-        }
     }
 
     var shouldAllowEmptySelection: Bool? {
